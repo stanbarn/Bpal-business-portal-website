@@ -20,13 +20,11 @@ namespace BPal.Business.Portal.Website.Controllers
     {
         IAccountService _accountService;
         INotificationService _notificationService;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public AccountsController(IAccountService accountService, INotificationService notificationService,  IHostingEnvironment hostingEnvironment)
+        public AccountsController(IAccountService accountService, INotificationService notificationService)
         {
             _accountService = accountService;
             _notificationService = notificationService;
-            _hostingEnvironment = hostingEnvironment;
         }
 
         [Authorize, HttpGet]
@@ -316,9 +314,9 @@ namespace BPal.Business.Portal.Website.Controllers
             new { UserId = account.AccountId, code = code }, protocol: Request.Scheme);
 
                 //send email notification
-                await _notificationService.SendEmail("noreply@whisperssafarisuganda.com", "Elephant Whispers Safaris Uganda", new List<EmailAddress> {
+                await _notificationService.SendEmail("noreply@bplas.com", "Bplas", new List<EmailAddress> {
                             new EmailAddress(account.EmailAddress)
-                        }, "Elephant Whispers Safaris Uganda", GenerateResetPasswordEmailTemplate(account, callbackUrl));
+                        }, "Bplas", GenerateResetPasswordEmailTemplate(account, callbackUrl));
 
                 return View("ForgotPasswordConfirmation");
             }

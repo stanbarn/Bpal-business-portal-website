@@ -8,9 +8,24 @@ namespace BPal.Business.Portal.Website.Controllers
 {
     public class CollectionsController : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
+
+        public async Task<IActionResult> Add()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> Edit()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Remove()
+        {
+            return View();
+        }
+
     }
 }

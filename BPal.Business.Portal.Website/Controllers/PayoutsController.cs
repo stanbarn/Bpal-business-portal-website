@@ -12,5 +12,19 @@ namespace BPal.Business.Portal.Website.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> Add()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> Edit()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Remove()
+        {
+            return View();
+        }
     }
 }

@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BPal.Business.Portal.Core\BPal.Business.Portal.Core.csproj" />
+    <ProjectReference Include="..\BPal.Business.Portal.Service\BPal.Business.Portal.Service.csproj" />
   </ItemGroup>
 
 
