@@ -9,24 +9,15 @@ namespace BPal.Business.Portal.Core.Services
 {
     public interface IAccountService
     {
-        IQueryable<Account> Get();
+        Task<ServiceResponse<Account>> GetAsync(string AccountId);
 
-        Task<Account> GetAsync(string AccountId);
+        Task<ServiceResponse<Account>> UpdateAsync(Account Account);
 
-        Task<Account> UpdateAsync(Account Account);
+        Task<ServiceResponse<Account>> CreateAsync(Account account);
 
-        Task<Account> CreateAsync(Account account);
+        Task<ServiceResponse<Account>> GetByEmailAsync(string email);
 
-        Task<Account> GetByEmailAsync(string email);
+        Task<TokenResponse> AuthenticateAsync(string username, string password);
 
-        Task<Account> ActivateAccountAsync(string email, string auth);
-
-        Task<Account> AuthenticateAsync(string username, string password);
-
-        Task<bool> IsEmailExistsAsync(string emailAddress);
-
-        Task<bool> IsTenantEmailExistsAsync(string emailAddress);
-
-        Task<Account> DeleteAsync(string Id);
     }
 }

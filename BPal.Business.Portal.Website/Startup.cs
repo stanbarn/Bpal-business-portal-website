@@ -53,8 +53,8 @@ namespace BPal.Business.Portal.Website
             //Add Policy Authorization
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
-                options.LoginPath = "/accounts/signin";
-                options.LogoutPath = "/accounts/signout";
+                options.LoginPath = "/signin";
+                options.LogoutPath = "/signout";
             });
 
             services.AddRazorPages()

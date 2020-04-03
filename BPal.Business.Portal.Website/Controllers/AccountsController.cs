@@ -63,7 +63,7 @@ namespace BPal.Business.Portal.Website.Controllers
             return View(account);
         }
 
-        [HttpGet]
+        [HttpGet("signin")]
         public IActionResult SignIn(string returnUrl = null)
         {
             if (SessionManager.IsAuthenticated)
@@ -77,7 +77,7 @@ namespace BPal.Business.Portal.Website.Controllers
             return View();
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost("signin"), ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn(SignInModel signInModel, string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
@@ -121,16 +121,6 @@ namespace BPal.Business.Portal.Website.Controllers
 
             return View(signInModel);
 
-
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> SignUp()
-        {
-            if (SessionManager.IsAuthenticated)
-                return RedirectToAction("Index");
-
-            return View(new SignUpModel());
 
         }
 
@@ -281,9 +271,9 @@ namespace BPal.Business.Portal.Website.Controllers
                 }
 
                 //send password reset email notification
-                await _notificationService.SendEmail("noreply@murcomhomes.com", "Murcom Homes", new List<EmailAddress> {
+                await _notificationService.SendEmail("noreply@bplas.com", "Bplas", new List<EmailAddress> {
                             new EmailAddress(account.EmailAddress)
-                        }, "Murcom Homes", GenerateAccountChangeEmailTemplate("Account Password Reset!", $"Hi { account.FirstName} { account.LastName}, Your Account password was successfully reset"));
+                        }, "Bplas", GenerateAccountChangeEmailTemplate("Account Password Reset!", $"Hi { account.FirstName} { account.LastName}, Your Account password was successfully reset"));
 
                 return RedirectToAction("SignIn");
             }
@@ -348,9 +338,9 @@ namespace BPal.Business.Portal.Website.Controllers
                 await _accountService.UpdateAsync(account);
 
                 //send email notification
-                await _notificationService.SendEmail("noreply@murcomhomes.com", "Murcom Homes", new List<EmailAddress> {
+                await _notificationService.SendEmail("noreply@bplas.com", "Bplas", new List<EmailAddress> {
                             new EmailAddress(account.EmailAddress)
-                        }, "Murcom Homes", GenerateAccountChangeEmailTemplate("Account Update Notification", $"Hello {account.FirstName}, Your account was updated at {DateTime.UtcNow.ToString("dddd, dd MMMM yyyy hh:mm tt")} GMT. If you did not do this, Kindly visit your Account and change the password"));
+                        }, "Bplas", GenerateAccountChangeEmailTemplate("Account Update Notification", $"Hello {account.FirstName}, Your account was updated at {DateTime.UtcNow.ToString("dddd, dd MMMM yyyy hh:mm tt")} GMT. If you did not do this, Kindly visit your Account and change the password"));
 
                 return RedirectToAction("Index");
             }
@@ -359,42 +349,8 @@ namespace BPal.Business.Portal.Website.Controllers
             return View();
         }
 
-
-        [HttpGet]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
-        {
-            if (userId == null || code == null)
-            {
-                return View("Error");
-            }
-
-            var account = await _accountService.GetAsync(userId);
-            if (account == null)
-            {
-                return RedirectToAction("ConfirmEmail");
-            }
-
-            if (account.IsEmailConfirmed)
-            {
-                return RedirectToAction("ConfirmEmail");
-            }
-
-            if (account.CreatedOn.AddDays(1) < DateTime.UtcNow)
-            {
-                return RedirectToAction("ConfirmEmail");
-            }
-
-            account.Status = AccountStatus.ACTIVE;
-            var activatedAccount = await _accountService.ActivateAccountAsync(account.EmailAddress, code);
-            if (account == null)
-            {
-                return View("ConfirmEmail");
-            }
-
-            return View("ConfirmEmail");
-        }
-
         [Authorize]
+        [HttpGet("signout")]
         public async Task<ActionResult> SignOut()
         {
             await SessionManager.SignOutAsync();
@@ -403,209 +359,6 @@ namespace BPal.Business.Portal.Website.Controllers
         }
 
         #region Helper Methods
-
-        private static string GenerateActivationEmailTemplate(Account account, string url)
-        {
-            var message = @"<!doctype html>
-<html xmlns='https://www.w3.org/1999/xhtml' xmlns:v='urn:schemas-microsoft-com:vml' xmlns:o='urn:schemas-microsoft-com:office:office'>
-
-<head>
-    <title></title>
-    <!--[if !mso]>-->
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <!--<![endif]-->
-    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-    <style type='text/css'>
-        #outlook a {
-            padding: 0;
-        }
-        
-        .ReadMsgBody {
-            width: 100%;
-        }
-        
-        .ExternalClass {
-            width: 100%;
-        }
-        
-        .ExternalClass * {
-            line-height: 100%;
-        }
-        
-        body {
-            margin: 0;
-            padding: 0;
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-        }
-        
-        table,
-        td {
-            border-collapse: collapse;
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
-        }
-        
-        img {
-            border: 0;
-            height: auto;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
-            -ms-interpolation-mode: bicubic;
-        }
-        
-        p {
-            display: block;
-            margin: 13px 0;
-        }
-    </style>
-    <!--[if !mso]><!-->
-    <style type='text/css'>
-        @media only screen and (max-width:480px) {
-            @-ms-viewport {
-                width: 320px;
-            }
-            @viewport {
-                width: 320px;
-            }
-        }
-    </style>
-    <link href='https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700' rel='stylesheet' type='text/css'>
-    <style type='text/css'>
-        @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);
-    </style>
-    <!--<![endif]-->
-    <style type='text/css'>
-        @media only screen and (min-width:480px) {
-            .mj-column-per-100 {
-                width: 100%!important;
-            }
-        }
-    </style>
-    <style type='text/css'>
-        @media only screen and (max-width:480px) {
-            .mj-hero-content {
-                width: 100% !important;
-            }
-        }
-    </style>
-</head>
-
-<body style='background: #f5f6fa;'>
-    <div style='background-color:#f5f6fa;'>
-        <div style='margin:0px auto;max-width:600px;'>
-            <table role='presentation' cellpadding='0' cellspacing='0' style='font-size:0px;width:100%;' align='center' border='0'>
-                <tbody>
-                    <tr>
-                        <td style='text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;padding-bottom:20px;padding-top:30px;'>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div style='margin:0 auto;max-width:600px;'>
-            <table role='presentation' cellpadding='0' cellspacing='0' style='width:100%;'>
-                <tbody>
-                    <tr style='vertical-align:top;'>
-                        <td height='100' style='background-color:#252525'>
-                            <img src='https://dalelo.azurewebsites.net/images/logo.png' style='margin:auto;display:flex;padding:15px 0;'/>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div style='margin:0px auto;max-width:600px;background:#fff;'>
-            <table role='presentation' cellpadding='0' cellspacing='0' style='font-size:0px;width:100%;background:#fff;' align='center' border='0'>
-                <tbody>
-                    <tr>
-                        <td style='text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;'>
-                            
-                            <div class='mj-column-per-100 outlook-group-fix' style='vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;'>
-                                <table role='presentation' cellpadding='0' cellspacing='0' width='100%' border='0'>
-                                    <tbody>
-                                        <tr>
-                                            <td style='word-break:break-word;font-size:0px;padding:10px 25px;' align='center'>
-                                                <div class='' style='cursor:auto;color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:40px;text-align:center;'>
-                                                    <h2 class='ks-header-h2' style='font-size: 30px; font-weight: 500; color: #333; margin-top: 0; margin-bottom: 0;'>
-                                                        Welcome to Murcom Properties!
-                                                    </h2>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style='word-break:break-word;font-size:0px;padding:10px 25px;' align='left'>
-                                                <div class='' style='cursor:auto;color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;text-align:left;'>
-                                                    <p style='font-size: 14px; color: #333; margin: 5px 0;'>Hi " + account.FirstName + " " + account.LastName + @", Welcome to Murcom Properties. Great to have you on board.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style='word-break:break-word;font-size:0px;padding:10px 25px;padding-top:20px;padding-bottom:20px;'>
-                                                <p style='color: #333; font-size: 1px; margin: 0px auto; border-top: 1px solid #e6e6e6; width: 100%;'></p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style='word-break:break-word;font-size:0px;padding:10px 25px;padding-bottom:0px;' align='left'>
-                                                <div class='' style='cursor:auto;color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;text-align:left;'>
-                                                    <h3 class='ks-header-h3' style='font-size: 24px; font-weight: 500; color: #333; margin-top: 0; margin-bottom: 10px;'>
-                                                                            1. Verify your account
-                                                                        </h3>
-                                                    <p style='font-size: 14px; color: #333; margin: 5px 0;'>
-                                                        To ensure you’re legitimate and not some fake person, please verify your account by clicking the button below.
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style='word-break:break-word;font-size:0px;padding:10px 25px;padding-bottom:30px;' align='left'>
-                                                <table role='presentation' cellpadding='0' cellspacing='0' style='border-collapse:separate;' align='left' border='0'>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td style='border:none;border-radius:2px;color:#fff;cursor:auto;padding:12px 30px;' align='center' valign='middle' bgcolor='#3a529b'>
-                                                                <a href='" + url + @"' style='text-decoration:none;line-height:100%;background:#3a529b;color:#fff;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:14px;font-weight:500;text-transform:none;margin:0px;' target='_blank'>
-                                                                Verify my account
-                                                            </a></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style='word-break:break-word;font-size:0px;padding:10px 25px;padding-bottom:20px;'>
-                                                <p style='color: #333; font-size: 1px; margin: 0px auto; border-top: 1px solid #e6e6e6; width: 100%;'>
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div style='margin:0px auto;max-width:600px;'>
-            <table role='presentation' cellpadding='0' cellspacing='0' style='font-size:0px;width:100%;' align='center' border='0'>
-                <tbody>
-                    <tr>
-                        <td style='text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;'>
-                            <div class='' style='cursor:auto;color:#858585;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:12px;line-height:22px;text-align:center;'>
-                                <div class='ks-copyright' style='margin-bottom: 15px;'>
-                                    Murcom Properties
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</body>
-
-</html>";
-            return message;
-        }
 
         private static string GenerateResetPasswordEmailTemplate(Account account, string url)
         {

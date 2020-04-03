@@ -7,40 +7,30 @@ using System.Text;
 
 namespace BPal.Business.Portal.Core.Models
 {
-    public class Account : ModifiableEntity
+    public class Account
     {
-        [Key]
         public string AccountId { get; set; }
 
-        [Required]
         public string FirstName { get; set; }
 
-        [Required]
         public string LastName { get; set; }
 
         public string CountryCode { get; set; }
 
         public string ImageUrl { get; set; }
 
-        [EmailAddress]
-        [Required]
         public string EmailAddress { get; set; }
 
-        [Required]
         public string Password { get; set; }
 
-        [StringLength(15), Required]
         public string PhoneNumber { get; set; }
 
-        [ForeignKey("AddressId")]
         public string AddressId { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
 
-        [Required]
         public AccountType Type { get; set; }
 
-        [Required]
         public AccountStatus Status { get; set; }
 
         public string ActivationToken { get; set; }
@@ -50,6 +40,8 @@ namespace BPal.Business.Portal.Core.Models
         public DateTime? LastLogIn { get; set; }
 
         public string LastLoginLocation { get; set; }
-
+        public string ModifiedBy { get; set; }
+        public DateTime ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 }
